@@ -14,11 +14,38 @@ const resolvers = {
 
     },
     Mutation: {
-        register: async (_, {username, email, password}) => {
+        register: async (_, { username, email, password }) => {
+            console.log("Iniciando registro de usuario...");
+
+            // Verificación de email
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                throw new Error("Este correo electrónico ya está registrado");
+            }
+
+            // Verificación de username
+            const existingUserByUsername = await User.findOne({ username });
+            if (existingUserByUsername) {
+                throw new Error("Este nombre de usuario ya está registrado.");
+            }
+
+            // Creación de usuario
             const hashedPassword = await bcrypt.hash(password, 10);
-            const user = new User({username, email, password: hashedPassword});
+            const user = new User({ username, email, password: hashedPassword });
             await user.save();
-            return user;
+
+            console.log("Usuario creado:", user);
+
+            // Generación del token
+            const token = jwt.sign({ id: user.id, email: user.email }, process.env.SECRET, { expiresIn: '1d' });
+
+            console.log("Token generado:", token);
+
+            if (!token) {
+                throw new Error("No se pudo generar el token");
+            }
+
+            return { token, user };
         },
         login: async (_, {email, password}) => {
             const user = await User.findOne({email});
