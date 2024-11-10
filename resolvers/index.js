@@ -28,7 +28,7 @@ const resolvers = {
             if (!valid) throw new Error('Contraseña incorrecta');
 
             const token = jwt.sign({id: user.id, email: user.email}, process.env.SECRET, {expiresIn: '1d'});
-            return token;
+            return {token, user};
         },
         addPost: async (_, {title, content}, {user}) => {
             if (!user) throw new Error("No autenticado");
