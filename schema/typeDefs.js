@@ -24,7 +24,11 @@ const typeDefs = gql`
         register(username: String!, email: String!, password: String!): User
         login(email: String!, password: String!): String
         addPost(title: String!, content: String!): Post
+        refreshToken: String
+        updatePost(id: ID!, title: String, content: String): Post
+        deletePost(id: ID!): String
     }
+   
 `;
 
 export default typeDefs;
