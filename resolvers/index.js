@@ -38,6 +38,14 @@ const resolvers = {
                 throw new Error(`Error al obtener las publicaciones: ${err.message}`);
             }
         },
+        getMyPosts: async (_, __, { user }) => {
+            if (!user) throw new Error("No autenticado");
+            try {
+                return await Post.find({ author: user.id }).populate('author', 'username email');
+            } catch (err) {
+                throw new Error(`Error al obtener las publicaciones propias: ${err.message}`);
+            }
+        },
 
         getPostById: async (_, { id }) => {
             try {
