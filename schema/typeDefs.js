@@ -12,12 +12,15 @@ const typeDefs = gql`
         id: ID!
         title: String!
         content: String!
-        author: User
+        author: User!
+        createAt:String!
+        updateAt: String!
     }
 
     type Query {
         me: User
         getPosts: [Post]
+        getPostById (id:ID!): Post
     }
 
     type Mutation {
@@ -27,6 +30,7 @@ const typeDefs = gql`
         refreshToken: String
         updatePost(id: ID!, title: String, content: String): Post
         deletePost(id: ID!): String
+        logout: String
     },
     type AuthPayload {
         token: String!
