@@ -20,20 +20,15 @@ mongoose.connect(process.env.MONGODB_URI, {
 // Middleware para verificar usuario a partir del token en cookies
 const getUser = (req) => {
     try {
-        console.log("Intentando obtener cookies", req.cookies);
-
-        const token = req.cookies.authToken; // Leer token de las cookies
+        const token = req.cookies.authToken;
         if (!token) {
-            console.log("No se encontro la cookie authToken");
             return null;
-
         }
-        const decoded = jwt.verify(token, process.env.SECRET);
-        console.log('Token verificado correctamente', decoded);
-        return decoded;
 
+        const decoded = jwt.verify(token, process.env.SECRET);
+        return decoded;
     } catch (error) {
-        console.error("Error al verificar token", error.message)
+        console.error("Error al verificar token:", error.message);
         return null;
     }
 };
@@ -48,7 +43,7 @@ const startServer = async () => {
         context: ({req, res}) => {
             console.log('Cookies recibidas', req.cookies);
             const user = getUser(req);
-            return {user, res}; // Pasamos `res` para manejar cookies en los resolvers
+            return {user, res, req}; // Pasamos `res` para manejar cookies en los resolvers
         },
     });
 
@@ -58,7 +53,11 @@ const startServer = async () => {
     // Configurar Apollo Server con Express
     server.applyMiddleware({
         app,
-        cors: {origin: 'http://localhost:3000', credentials: true}, // Permitir cookies en el cliente
+        cors: {
+            origin: 'http://localhost:3000',
+            credentials: true,
+            allowedHeaders: ['Content-Type', 'Authorization'],
+        },
     });
 
     // Iniciar el servidor
